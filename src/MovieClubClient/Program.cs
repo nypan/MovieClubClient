@@ -11,7 +11,36 @@ class Program
     {
         client.BaseAddress = new Uri(baseUrl);
         movieClient = new MovieClubApiClient(client);
+        var rootCommand = new RootCommand("Example of Console client to Movie API");
 
+        SearchCommand(rootCommand);
+        TeamCommand(rootCommand);
+        return rootCommand.InvokeAsync(args).Result;
+
+    }
+
+    private static void TeamCommand(RootCommand rootCommand)
+    {
+        var teamNameOption = new Option<string>(
+        name: "--name",
+        description: "Get team members");
+        var teamCommand = new Command(name: "team", description: "Get team members")
+        {
+            teamNameOption
+        };
+        rootCommand.AddCommand(teamCommand);
+        teamCommand.SetHandler(async (name) =>
+        {
+            await GetMembersInTeam(name);
+        },
+        teamNameOption);
+
+
+    }
+
+    
+    private static void SearchCommand(RootCommand rootCommand)
+    {
         var searchTitleOption = new Option<string>(
         name: "--title",
         description: "Search movies by title");
@@ -37,8 +66,7 @@ class Program
         description: "Search movies by runtime minutes to");
 
 
-        var rootCommand = new RootCommand("Example of Console client to Movie API");
-        var searchCommand = new Command(name : "search", description: "Search movies")
+        var searchCommand = new Command(name: "search", description: "Search movies")
         {
             searchTitleOption,
             searchGenreOption,
@@ -50,9 +78,9 @@ class Program
 
         rootCommand.AddCommand(searchCommand);
 
-        searchCommand.SetHandler(async (title,genre,yearFrom,yearTo,runtimeMinutesFrom,runtimeMinutesTo) =>
+        searchCommand.SetHandler(async (title, genre, yearFrom, yearTo, runtimeMinutesFrom, runtimeMinutesTo) =>
         {
-            await SearchMovieByTitle(title,genre,yearFrom,yearTo,runtimeMinutesFrom,runtimeMinutesTo);
+            await SearchMovieByTitle(title, genre, yearFrom, yearTo, runtimeMinutesFrom, runtimeMinutesTo);
         },
         searchTitleOption,
         searchGenreOption,
@@ -60,8 +88,15 @@ class Program
         searchYearToOption,
         searchRuntimeMinutesFromOption,
         searchRuntimeMinutesToOption);
+    }
+
+    #region API call
   
-        return rootCommand.InvokeAsync(args).Result;
+    private static async Task GetMembersInTeam(string name)
+    {
+        var members = await movieClient.TeamAsync(name);
+        WriteTables.WriteMemberTable(members,name);
+
     }
 
     private static async Task SearchMovieByTitle(
@@ -72,12 +107,17 @@ class Program
         int? runtimeMinutesFrom,
         int? runtimeMinutesTo)
     {
-        var movieSearch = new MovieSearchDto { Title = title };
+        var movieSearch = new MovieSearchDto
+        { 
+            Title = title,
+            Genre = genre,
+            YearFrom = yearFrom,
+            YearTo = yearTo,
+            RuntimeMinutesFrom = runtimeMinutesFrom,
+            RuntimeMinutesTo = runtimeMinutesTo,
+        };
         var movies = await movieClient.SearchAsync(movieSearch);
         WriteTables.WriteMovieTable(movies);
-        //foreach (var movie in movies)
-        //{
-        //    Console.WriteLine($"Id : {movie.Id}  Title : {movie.Title}");
-        //}
     }
+    #endregion
 }
