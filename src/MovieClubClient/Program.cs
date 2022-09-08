@@ -74,9 +74,10 @@ class Program
     {
         var movieSearch = new MovieSearchDto { Title = title };
         var movies = await movieClient.SearchAsync(movieSearch);
-        foreach (var movie in movies)
-        {
-            Console.WriteLine($"Id : {movie.Id}  Title : {movie.Title}");
-        }
+        WriteTables.WriteMovieTable(movies);
+        //foreach (var movie in movies)
+        //{
+        //    Console.WriteLine($"Id : {movie.Id}  Title : {movie.Title}");
+        //}
     }
 }
