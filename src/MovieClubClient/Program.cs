@@ -1,5 +1,6 @@
 ﻿using MovieClubClient;
 using System.CommandLine;
+using System.Xml.Linq;
 
 class Program
 {
@@ -15,9 +16,30 @@ class Program
 
         SearchCommand(rootCommand);
         TeamCommand(rootCommand);
+        GetMemberCommand(rootCommand);
         return rootCommand.InvokeAsync(args).Result;
 
     }
+
+    private static void GetMemberCommand(RootCommand rootCommand)
+    {
+        var memberIdOption = new Option<Guid>(
+        name: "--id",
+        description: "Member Id (Guid)");
+        var getMemberCommand = new Command(name: "getmember", description: "Get team member")
+        {
+            memberIdOption
+        };
+        rootCommand.AddCommand(getMemberCommand);
+        getMemberCommand.SetHandler(async (id) =>
+        {
+            await GetMemberById(id);
+        },
+        memberIdOption);
+
+    }
+
+    
 
     private static void TeamCommand(RootCommand rootCommand)
     {
@@ -91,7 +113,12 @@ class Program
     }
 
     #region API call
-  
+
+    private static async Task GetMemberById(Guid id)
+    {
+        var member = await movieClient.MembersAsync(id);
+        WriteTables.WriteMemberWithMovies(member);
+    }
     private static async Task GetMembersInTeam(string name)
     {
         var members = await movieClient.TeamAsync(name);

@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using ConsoleTableExt;
 
 namespace MovieClubClient
@@ -13,15 +14,25 @@ namespace MovieClubClient
         public static void WriteMovieTable(ICollection<Movie> movies)
         {
             ConsoleTableBuilder.From(MovieTableData(movies))
-                .WithTitle($"Search result {movies.Count} movies")
+                .WithFormat(ConsoleTableBuilderFormat.Alternative)
+                .WithTitle($"Search result {movies.Count} movies", ConsoleColor.DarkRed, ConsoleColor.Gray)
                 .ExportAndWriteLine();
         }
 
         internal static void WriteMemberTable(ICollection<MemberDto> members, string name)
         {
             ConsoleTableBuilder.From(MemberTableData(members))
-                .WithTitle($"Team {name} {members.Count} members")
+                .WithFormat(ConsoleTableBuilderFormat.Alternative)
+                .WithTitle($"Team {name} {members.Count} members",  ConsoleColor.DarkRed, ConsoleColor.Gray)
                 .ExportAndWriteLine();
+        }
+
+        internal static void WriteMemberWithMovies(MemberWithMoviesDto member)
+        {
+            ConsoleTableBuilder.From(MovieTableData(member.FavoriteMovies))
+               .WithFormat(ConsoleTableBuilderFormat.Alternative)
+               .WithTitle($"Member {member.FullName} favorites movies", ConsoleColor.DarkRed, ConsoleColor.Gray)
+               .ExportAndWriteLine();
         }
 
         static DataTable MemberTableData(ICollection<MemberDto> members)
