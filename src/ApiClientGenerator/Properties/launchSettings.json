@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ApiClientGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "https://app-dev-movie-api.azurewebsites.net/swagger/v1/swagger.json c:\\temp\\api\\MovieClubApiClient.cs"
+    }
+  }
+}
