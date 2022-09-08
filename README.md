@@ -1,8 +1,14 @@
 # MovieClubClient
 Ett exempel på Client mot Daniels api 
 
+## Generera proxy class med hjälp av NSwag
 
-* Console app för generera Proxy class "
-* Cons
-* NSwagStudio för att generera Ai anrop
+```
+.\ApiClientGenerator.exe https://app-dev-movie-api.azurewebsites.net/swagger/v1/swagger.json c:\temp\MovieClubApiClient.cs
+```
 
+## Console app som att anropa web api med hjälp av proxy classen
+
+```
+.\MovieClubClient.exe
+```
