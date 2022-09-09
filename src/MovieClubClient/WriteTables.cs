@@ -19,6 +19,15 @@ namespace MovieClubClient
                 .ExportAndWriteLine();
         }
 
+        public static void WriteMovieTable(Movie movie)
+        {
+            var movies = new List<Movie> { movie };
+            ConsoleTableBuilder.From(MovieTableData(movies))
+                .WithFormat(ConsoleTableBuilderFormat.Alternative)
+                .WithTitle($"Movie", ConsoleColor.DarkRed, ConsoleColor.Gray)
+                .ExportAndWriteLine();
+        }
+
         internal static void WriteMemberTable(ICollection<MemberDto> members, string name)
         {
             ConsoleTableBuilder.From(MemberTableData(members))

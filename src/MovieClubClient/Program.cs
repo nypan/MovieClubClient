@@ -24,6 +24,7 @@ class Program
         AddMemberCommand(rootCommand);
         DeleteMemberCommand(rootCommand);
         UpdateMemberCommand(rootCommand);
+        GetMovieCommand(rootCommand);
         return rootCommand.InvokeAsync(args).Result;
 
     }
@@ -33,7 +34,33 @@ class Program
 
 
 
+
+
     #region  Arguments command
+
+    private static void GetMovieCommand(RootCommand rootCommand)
+    {
+        var movieIdOption = new Option<string>(
+        name: "--id",
+        description: "member id (string)");
+
+        var getMovieCommand = new Command(name: "getmovie", description: "Get Movie by id")
+        {
+            movieIdOption
+        };
+
+        rootCommand.AddCommand(getMovieCommand);
+
+        getMovieCommand.SetHandler(async (id) =>
+        {
+            await GetMovieById(id);
+        },
+        movieIdOption);
+
+
+    }
+
+    
 
     private static void UpdateMemberCommand(RootCommand rootCommand)
     {
@@ -228,6 +255,13 @@ class Program
     #endregion
 
     #region API call
+
+    private static async Task GetMovieById(string id)
+    {
+        var movie = await movieClient.MoviesAsync(id);
+        WriteTables.WriteMovieTable(movie);
+
+    }
 
     private static async Task UpdateMemberToTeam(Guid id,string fullname, string team, IEnumerable<string> favorites)
     {
