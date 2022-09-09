@@ -23,6 +23,7 @@ class Program
         GetMemberCommand(rootCommand);
         AddMemberCommand(rootCommand);
         DeleteMemberCommand(rootCommand);
+        UpdateMemberCommand(rootCommand);
         return rootCommand.InvokeAsync(args).Result;
 
     }
@@ -30,7 +31,50 @@ class Program
 
 
 
+
+
     #region  Arguments command
+
+    private static void UpdateMemberCommand(RootCommand rootCommand)
+    {
+        var memberIdOption = new Option<Guid>(
+         name: "--id",
+         description: "member id (Guid)");
+
+        var fullNameOption = new Option<string>(
+         name: "--fullname",
+         description: "Fullname of member");
+
+        var teamOption = new Option<string>(
+         name: "--team",
+         description: "Team name");
+
+        var favoritesOption = new Option<IEnumerable<string>>(
+            name: "--favorites",
+            description: "Add favoritemovies (id)")
+        { AllowMultipleArgumentsPerToken = true };
+
+        var updateMemberCommand = new Command(name: "updatemember", description: "Update team member")
+        {
+            memberIdOption,
+            fullNameOption,
+            teamOption,
+            favoritesOption
+        };
+        rootCommand.AddCommand(updateMemberCommand);
+
+        updateMemberCommand.SetHandler(async (id,fullname, team, favorites) =>
+        {
+            await UpdateMemberToTeam(id,fullname, team, favorites);
+        },
+        memberIdOption,
+        fullNameOption,
+        teamOption,
+        favoritesOption);
+
+    }
+
+    
 
     private static void DeleteMemberCommand(RootCommand rootCommand)
     {
@@ -184,6 +228,18 @@ class Program
     #endregion
 
     #region API call
+
+    private static async Task UpdateMemberToTeam(Guid id,string fullname, string team, IEnumerable<string> favorites)
+    {
+        var updatemember = new UpdateMemberDto();
+        updatemember.Id = id;
+        updatemember.FullName = fullname;
+        updatemember.Team = team;
+        updatemember.FavoriteMovies = favorites.ToArray();
+        var result = await movieClient.UpdateAsync(updatemember);
+        Console.WriteLine($"Updated Member Id {id} result {result}");
+
+    }
     private static async Task DeleteMemberToTeam(Guid id)
     {
         var result = await movieClient.RemoveAsync(id);
