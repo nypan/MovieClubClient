@@ -65,19 +65,27 @@ class Program
          name: "--team",
          description: "Team name");
 
+        var favoritesOption = new Option<IEnumerable<string>>(
+            name: "--favorites",
+            description: "Add favoritemovies (id)")
+        { AllowMultipleArgumentsPerToken = true };
+
         var addMemberCommand = new Command(name: "addmember", description: "Add team member")
         {
             fullNameOption,
             teamOption,
+            favoritesOption
         };
 
         rootCommand.AddCommand(addMemberCommand);
 
-        addMemberCommand.SetHandler(async (fullname,team) =>
+        addMemberCommand.SetHandler(async (fullname,team,favorites) =>
         {
-            await AddMemberToTeam(fullname,team);
+            await AddMemberToTeam(fullname,team,favorites);
         },
-        fullNameOption,teamOption);
+        fullNameOption,
+        teamOption,
+        favoritesOption);
 
     }
 
@@ -181,12 +189,12 @@ class Program
         var result = await movieClient.RemoveAsync(id);
         Console.WriteLine($"Removed Member Id {id} result {result}");
     }
-    private static async Task AddMemberToTeam(string fullname, string team)
+    private static async Task AddMemberToTeam(string fullname, string team, IEnumerable<string> favorites)
     {
         var addmember = new NewMemberDto();
         addmember.FullName = fullname;
         addmember.Team = team;
-        addmember.FavoriteMovies = new string[] { }; 
+        addmember.FavoriteMovies = favorites.ToArray(); 
         var memberId = await movieClient.AddAsync(addmember);
         Console.WriteLine($"Added Member Id {memberId}");
     }
