@@ -17,10 +17,37 @@ class Program
         SearchCommand(rootCommand);
         TeamCommand(rootCommand);
         GetMemberCommand(rootCommand);
+        AddMemberCommand(rootCommand);
         return rootCommand.InvokeAsync(args).Result;
 
     }
 
+
+    #region  Arguments command
+    private static void AddMemberCommand(RootCommand rootCommand)
+    {
+        var fullNameOption = new Option<string>(
+         name: "--fullname",
+         description: "Fullname of member");
+
+        var teamOption = new Option<string>(
+         name: "--team",
+         description: "Team name");
+        var addMemberCommand = new Command(name: "addmember", description: "Add team member")
+        {
+            fullNameOption,
+            teamOption,
+        };
+        rootCommand.AddCommand(addMemberCommand);
+        addMemberCommand.SetHandler(async (fullname,team) =>
+        {
+            await AddMemberToTeam(fullname,team);
+        },
+        fullNameOption,teamOption);
+
+    }
+
+    
     private static void GetMemberCommand(RootCommand rootCommand)
     {
         var memberIdOption = new Option<Guid>(
@@ -39,7 +66,7 @@ class Program
 
     }
 
-    
+
 
     private static void TeamCommand(RootCommand rootCommand)
     {
@@ -60,7 +87,7 @@ class Program
 
     }
 
-    
+
     private static void SearchCommand(RootCommand rootCommand)
     {
         var searchTitleOption = new Option<string>(
@@ -112,7 +139,19 @@ class Program
         searchRuntimeMinutesToOption);
     }
 
+    #endregion
+
     #region API call
+
+    private static async Task AddMemberToTeam(string fullname, string team)
+    {
+        var addmember = new NewMemberDto();
+        addmember.FullName = fullname;
+        addmember.Team = team;
+        addmember.FavoriteMovies = new string[] { }; 
+        var memberId = await movieClient.AddAsync(addmember);
+        Console.WriteLine($"Added Member Id {memberId}");
+    }
 
     private static async Task GetMemberById(Guid id)
     {
