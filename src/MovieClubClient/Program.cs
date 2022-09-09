@@ -8,12 +8,12 @@ using System.Xml.Linq;
 class Program
 {
     private static readonly HttpClient client = new HttpClient();
-    private static string baseUrl = "https://app-dev-movie-api.azurewebsites.net";
+    private static string baseUrl = "https://app-lab-codingdojo-be.azurewebsites.net";
     private static MovieClubApiClient movieClient;
-    private static string Version = "Delta version";
+    private static string Version = "Beta version";
     static int Main(string[] args)
     {
-        Console.WriteLine($"Api {Version}");
+        Console.WriteLine($"Api {Version} {baseUrl}");
         client.BaseAddress = new Uri(baseUrl);
         movieClient = new MovieClubApiClient(client);
         var rootCommand = new RootCommand("Example of Console client to Movie API");
@@ -149,23 +149,24 @@ class Program
 
     private static async Task AddMemberToTeam(string fullname, string team)
     {
-        var addmember = new NewMemberDto();
+        var addmember = new CreateMemberDTO();
         addmember.FullName = fullname;
         addmember.Team = team;
         addmember.FavoriteMovies = new string[] { }; 
-        var memberId = await movieClient.AddAsync(addmember);
-        Console.WriteLine($"Added Member Id {memberId}");
+        var member = await movieClient.MemberPOSTAsync(addmember);
+        Console.WriteLine($"Added Member Id {member.Id} {member.FullName}");
     }
 
     private static async Task GetMemberById(Guid id)
     {
-        var member = await movieClient.MembersAsync(id);
+        var member = await movieClient.MemberGETAsync(id);
         WriteTables.WriteMemberWithMovies(member);
     }
     private static async Task GetMembersInTeam(string name)
     {
-        var members = await movieClient.TeamAsync(name);
-        WriteTables.WriteMemberTable(members,name);
+        var members = await movieClient.MemberGET2Async(name);
+        
+        //WriteTables.WriteMemberTable(members,name);
 
     }
 
@@ -186,7 +187,7 @@ class Program
             RuntimeMinutesFrom = runtimeMinutesFrom,
             RuntimeMinutesTo = runtimeMinutesTo,
         };
-        var movies = await movieClient.SearchAsync(movieSearch);
+        var movies = await movieClient.MovieAllAsync(movieSearch.Title);
         WriteTables.WriteMovieTable(movies);
     }
     #endregion

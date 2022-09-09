@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -27,7 +28,7 @@ namespace MovieClubClient
                 .ExportAndWriteLine();
         }
 
-        internal static void WriteMemberWithMovies(MemberWithMoviesDto member)
+        internal static void WriteMemberWithMovies(MemberDto member)
         {
             ConsoleTableBuilder.From(MovieTableData(member.FavoriteMovies))
                .WithFormat(ConsoleTableBuilderFormat.Alternative)
