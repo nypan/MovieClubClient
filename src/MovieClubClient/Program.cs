@@ -3,16 +3,17 @@ using System.CommandLine;
 using System.Xml.Linq;
 
 /// <summary>
-///  Gamma version
+///  Delta version
 /// </summary>
 class Program
 {
     private static readonly HttpClient client = new HttpClient();
     private static string baseUrl = "https://app-dev-movie-api.azurewebsites.net";
     private static MovieClubApiClient movieClient;
-
+    private static string Version = "Delta version";
     static int Main(string[] args)
     {
+        Console.WriteLine($"Api {Version}");
         client.BaseAddress = new Uri(baseUrl);
         movieClient = new MovieClubApiClient(client);
         var rootCommand = new RootCommand("Example of Console client to Movie API");

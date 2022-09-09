@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MovieClubClient": {
+      "commandName": "Project",
+      "commandLineArgs": "addmember --fullname \"Putte\" --team Delta"
+    }
+  }
+}
