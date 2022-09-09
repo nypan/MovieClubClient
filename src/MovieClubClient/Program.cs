@@ -1,5 +1,6 @@
 ﻿using MovieClubClient;
 using System.CommandLine;
+using System.Threading.Tasks.Dataflow;
 using System.Xml.Linq;
 
 /// <summary>
@@ -25,6 +26,7 @@ class Program
         DeleteMemberCommand(rootCommand);
         UpdateMemberCommand(rootCommand);
         GetMovieCommand(rootCommand);
+        GetMoviesByTitle(rootCommand);
         return rootCommand.InvokeAsync(args).Result;
 
     }
@@ -36,7 +38,32 @@ class Program
 
 
 
+
+
     #region  Arguments command
+
+    private static void GetMoviesByTitle(RootCommand rootCommand)
+    {
+        var movieTitleOption = new Option<string>(
+        name: "--title",
+        description: "Title of movie");
+
+        var getMoviesByTitleCommand = new Command(name: "getmoviebytitle", description: "Get movies by title")
+        {
+            movieTitleOption
+        };
+
+        rootCommand.AddCommand(getMoviesByTitleCommand);
+
+        getMoviesByTitleCommand.SetHandler(async (title) =>
+        {
+            await GetMovieByTitle(title);
+        },
+        movieTitleOption);
+
+    }
+
+    
 
     private static void GetMovieCommand(RootCommand rootCommand)
     {
@@ -256,6 +283,11 @@ class Program
 
     #region API call
 
+    private static async Task GetMovieByTitle(string title)
+    {
+        var movies = await movieClient.TitleAsync(title);
+        WriteTables.WriteMovieTable(movies);
+    }
     private static async Task GetMovieById(string id)
     {
         var movie = await movieClient.MoviesAsync(id);
