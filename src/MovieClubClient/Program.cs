@@ -10,10 +10,10 @@ class Program
     private static readonly HttpClient client = new HttpClient();
     private static string baseUrl = "https://app-dev-movie-api.azurewebsites.net";
     private static MovieClubApiClient movieClient;
-    private static string Version = "Delta version";
+    private static string Version = "Alpha version";
     static int Main(string[] args)
     {
-        Console.WriteLine($"Api {Version}");
+        Console.WriteLine($"Api {Version} {baseUrl}");
         client.BaseAddress = new Uri(baseUrl);
         movieClient = new MovieClubApiClient(client);
         var rootCommand = new RootCommand("Example of Console client to Movie API");
@@ -186,7 +186,7 @@ class Program
             RuntimeMinutesFrom = runtimeMinutesFrom,
             RuntimeMinutesTo = runtimeMinutesTo,
         };
-        var movies = await movieClient.SearchAsync(movieSearch);
+        var movies = await movieClient.GetMovieByIDAsync(movieSearch.Title);
         WriteTables.WriteMovieTable(movies);
     }
     #endregion
