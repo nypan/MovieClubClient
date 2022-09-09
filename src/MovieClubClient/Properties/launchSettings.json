@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MovieClubClient": {
+      "commandName": "Project",
+      "commandLineArgs": "search --title \"Shine\""
+    }
+  }
+}

@@ -1,15 +1,18 @@
 ﻿using MovieClubClient;
+using Newtonsoft.Json;
 using System.CommandLine;
 using System.Xml.Linq;
 
 class Program
 {
     private static readonly HttpClient client = new HttpClient();
-    private static string baseUrl = "https://app-dev-movie-api.azurewebsites.net";
+    private static string baseUrl = "https://app-lab-codingdojo-backend.azurewebsites.net";
     private static MovieClubApiClient movieClient;
+    private static string Version = "Gamma version";
 
     static int Main(string[] args)
     {
+        Console.WriteLine($"API {Version} url {baseUrl}");
         client.BaseAddress = new Uri(baseUrl);
         movieClient = new MovieClubApiClient(client);
         var rootCommand = new RootCommand("Example of Console client to Movie API");
@@ -149,19 +152,19 @@ class Program
         addmember.FullName = fullname;
         addmember.Team = team;
         addmember.FavoriteMovies = new string[] { }; 
-        var memberId = await movieClient.AddAsync(addmember);
-        Console.WriteLine($"Added Member Id {memberId}");
+        //var memberId = await movieClient.AddAsync(addmember);
+        //Console.WriteLine($"Added Member Id {memberId}");
     }
 
     private static async Task GetMemberById(Guid id)
     {
-        var member = await movieClient.MembersAsync(id);
-        WriteTables.WriteMemberWithMovies(member);
+        //var member = await movieClient.MembersAsync(id);
+        //WriteTables.WriteMemberWithMovies(member);
     }
     private static async Task GetMembersInTeam(string name)
     {
-        var members = await movieClient.TeamAsync(name);
-        WriteTables.WriteMemberTable(members,name);
+        //var members = await movieClient.TeamAsync(name);
+        //WriteTables.WriteMemberTable(members,name);
 
     }
 
@@ -182,7 +185,8 @@ class Program
             RuntimeMinutesFrom = runtimeMinutesFrom,
             RuntimeMinutesTo = runtimeMinutesTo,
         };
-        var movies = await movieClient.SearchAsync(movieSearch);
+        var moviesJson = await movieClient.Movie2Async(movieSearch.Title);
+        var movies =  JsonConvert.DeserializeObject<List<Movie>>(moviesJson);
         WriteTables.WriteMovieTable(movies);
     }
     #endregion
