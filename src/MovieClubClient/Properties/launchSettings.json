@@ -2,7 +2,7 @@
   "profiles": {
     "MovieClubClient": {
       "commandName": "Project",
-      "commandLineArgs": "addmember --fullname \"Putte\" --team Delta"
+      "commandLineArgs": "deletemember --id 357c7458-8f9e-453e-e520-08da92377d3b"
     }
   }
 }

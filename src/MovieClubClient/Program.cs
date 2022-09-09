@@ -13,7 +13,7 @@ class Program
     private static string Version = "Delta version";
     static int Main(string[] args)
     {
-        Console.WriteLine($"Api {Version}");
+        Console.WriteLine($"Api {Version} {baseUrl}");
         client.BaseAddress = new Uri(baseUrl);
         movieClient = new MovieClubApiClient(client);
         var rootCommand = new RootCommand("Example of Console client to Movie API");
@@ -22,12 +22,39 @@ class Program
         TeamCommand(rootCommand);
         GetMemberCommand(rootCommand);
         AddMemberCommand(rootCommand);
+        DeleteMemberCommand(rootCommand);
         return rootCommand.InvokeAsync(args).Result;
 
     }
 
 
+
+
     #region  Arguments command
+
+    private static void DeleteMemberCommand(RootCommand rootCommand)
+    {
+        var memberIdOption = new Option<Guid>(
+        name: "--id",
+        description: "Member id (Guid)");
+
+        var deleteMemberCommand = new Command(name: "deletemember", description: "Remove team member")
+        {
+            memberIdOption
+        };
+
+        rootCommand.AddCommand(deleteMemberCommand);
+
+        deleteMemberCommand.SetHandler(async (id) =>
+        {
+            await DeleteMemberToTeam(id);
+        },
+        memberIdOption);
+
+    }
+
+    
+
     private static void AddMemberCommand(RootCommand rootCommand)
     {
         var fullNameOption = new Option<string>(
@@ -37,12 +64,15 @@ class Program
         var teamOption = new Option<string>(
          name: "--team",
          description: "Team name");
+
         var addMemberCommand = new Command(name: "addmember", description: "Add team member")
         {
             fullNameOption,
             teamOption,
         };
+
         rootCommand.AddCommand(addMemberCommand);
+
         addMemberCommand.SetHandler(async (fullname,team) =>
         {
             await AddMemberToTeam(fullname,team);
@@ -146,7 +176,11 @@ class Program
     #endregion
 
     #region API call
-
+    private static async Task DeleteMemberToTeam(Guid id)
+    {
+        var result = await movieClient.RemoveAsync(id);
+        Console.WriteLine($"Removed Member Id {id} result {result}");
+    }
     private static async Task AddMemberToTeam(string fullname, string team)
     {
         var addmember = new NewMemberDto();
